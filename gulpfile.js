@@ -2,6 +2,9 @@
 const gulp = require('gulp')
 const jshint = require('gulp-jshint')
 const babel = require('gulp-babel')
+const concat = require('gulp-concat')
+const uglify = require('gulp-uglify')
+const rename = require('gulp-rename')
 
 /*
 任务如果指定了 return 那么这个任务就是个异步的任务
@@ -23,5 +26,18 @@ gulp.task('babel', ['jshint'], function () {  // 中间数组的作用：先执�
     }))
     .pipe(gulp.dest('build/js'))  // 将gulp内存中的数据流输出到指定目录下
 })
+
+gulp.task('concat', ['babel'], function () {
+  return gulp.src(['.build/js/module1.js', '.build/js/module2.js'])
+    .pipe(concat('built.js'))  // 合并所有js文件，并且命名
+    .pipe(gulp.dest('./build/js'))  // 输出目录
+})
+
+gulp.task('uglify', ['concat', function () {
+  return gulp.src('./build/js/built.js')
+    .pipe(uglify())  // 压缩js代码
+    .pipe(rename('dist.min.js'))  // 重命名js文件
+    .pipe(gulp.dest('./dist/js/dist.min.js'))
+}])
 
 gulp.task('default', ['babel'])  // 异步执行
